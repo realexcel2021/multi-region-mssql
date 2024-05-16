@@ -3,13 +3,13 @@ module "rds_proxy" {
 
   name                   = "rds-proxy-master"
   iam_role_name          = "rds-proxy-master-role"
-  vpc_subnet_ids         = module.vpc_region1.database_subnets
+  vpc_subnet_ids         = var.subnet_ids_region1
   vpc_security_group_ids = ["${module.rds_proxy_1_sg.security_group_id}"]
 
   endpoints = {
     read_write = {
       name                   = "read-write-endpoint"
-      vpc_subnet_ids         = module.vpc_region1.database_subnets
+      vpc_subnet_ids         = var.subnet_ids_region1
       vpc_security_group_ids = ["${module.rds_proxy_1_sg.security_group_id}"]
     }
     # read_only = {

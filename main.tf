@@ -54,7 +54,7 @@ module "master" {
   port     = local.port
 
   multi_az               = false
-  db_subnet_group_name   = module.vpc_region1.database_subnet_group_name
+  db_subnet_group_name   = aws_db_subnet_group.this.name
   vpc_security_group_ids = [module.security_group_region1.security_group_id]
 
   maintenance_window              = "Mon:00:00-Mon:03:00"
@@ -139,7 +139,7 @@ module "replica" {
   deletion_protection     = false
 
   # Specify a subnet group created in the replica region
-  db_subnet_group_name = module.vpc_region2.database_subnet_group_name
+  db_subnet_group_name = aws_db_subnet_group.this2.name
 
   tags = local.tags
 }

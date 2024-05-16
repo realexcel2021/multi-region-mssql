@@ -3,7 +3,7 @@ module "rds_proxy_1_sg" {
 
   name        = "rds-proxy-mssql-master"
   description = "Security group for mssql RDS proxy master access to lambda"
-  vpc_id      = module.vpc_region1.vpc_id
+  vpc_id      = var.vpc_id_region_1
 
   ingress_with_cidr_blocks = [
     {

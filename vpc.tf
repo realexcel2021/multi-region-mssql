@@ -3,21 +3,25 @@
 # VPC for both regions
 ################################################################################
 
-module "vpc_region1" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
 
-  name = local.name
-  cidr = "10.100.0.0/18"
+resource "aws_db_subnet_group" "this" {
+  name       = "mssql-region-1"
+  subnet_ids = var.subnet_ids_region1
 
-  azs              = ["${local.region1}a", "${local.region1}b", "${local.region1}c"]
-  public_subnets   = ["10.100.0.0/24", "10.100.1.0/24", "10.100.2.0/24"]
-  private_subnets  = ["10.100.3.0/24", "10.100.4.0/24", "10.100.5.0/24"]
-  database_subnets = ["10.100.7.0/24", "10.100.8.0/24", "10.100.9.0/24"]
+  tags = {
+    Name = "mssql-region-1"
+  }
+}
 
-  create_database_subnet_group = true
+resource "aws_db_subnet_group" "this2" {
+  name       = "mssql-region-2"
+  subnet_ids = var.subnet_ids_region2
 
-  tags = local.tags
+  provider = aws.region2
+
+  tags = {
+    Name = "mssql-region-2"
+  }
 }
 
 module "security_group_region1" {
@@ -26,7 +30,7 @@ module "security_group_region1" {
 
   name        = local.name
   description = "Replica MSSQL security group"
-  vpc_id      = module.vpc_region1.vpc_id
+  vpc_id      = var.vpc_id_region_1
 
   # ingress
   ingress_with_cidr_blocks = [
@@ -35,7 +39,7 @@ module "security_group_region1" {
       to_port     = 1433
       protocol    = "tcp"
       description = "MSSQL access from within VPC"
-      cidr_blocks = module.vpc_region1.vpc_cidr_block
+      cidr_blocks = var.vpc_cidr_block
       
     },
   ]
@@ -43,26 +47,6 @@ module "security_group_region1" {
   tags = local.tags
 }
 
-module "vpc_region2" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
-
-  providers = {
-    aws = aws.region2
-  }
-
-  name = local.name
-  cidr = "10.100.0.0/18"
-
-  azs              = ["${local.region2}a", "${local.region2}b", "${local.region2}c"]
-  public_subnets   = ["10.100.0.0/24", "10.100.1.0/24", "10.100.2.0/24"]
-  private_subnets  = ["10.100.3.0/24", "10.100.4.0/24", "10.100.5.0/24"]
-  database_subnets = ["10.100.7.0/24", "10.100.8.0/24", "10.100.9.0/24"]
-
-  create_database_subnet_group = true
-
-  tags = local.tags
-}
 
 module "security_group_region2" {
   source  = "terraform-aws-modules/security-group/aws"
@@ -74,7 +58,7 @@ module "security_group_region2" {
 
   name        = local.name
   description = "Replica MSSQL security group"
-  vpc_id      = module.vpc_region2.vpc_id
+  vpc_id      = var.vpc_id_region_2
 
   # ingress
   ingress_with_cidr_blocks = [
@@ -83,7 +67,7 @@ module "security_group_region2" {
       to_port     = 1433
       protocol    = "tcp"
       description = "MSSQL access from within VPC"
-      cidr_blocks = module.vpc_region2.vpc_cidr_block
+      cidr_blocks = var.vpc_cidr_block
     },
   ]
 

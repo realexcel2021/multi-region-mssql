@@ -1,5 +1,10 @@
+resource "random_string" "this" {
+  length = 5
+  special = false
+}
+
 resource "aws_secretsmanager_secret" "db_pass" {
-  name = "db_pass_mssql"
+  name = "db_pass_mssql-${random_string.this.result}"
 
   replica {
     region = local.region2
